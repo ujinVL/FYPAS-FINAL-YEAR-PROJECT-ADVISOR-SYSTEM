@@ -8,45 +8,18 @@ public class AdvisorRequest {
     private String projectTitle;
     private String status;
 
-    public AdvisorRequest() {}
+    public int getRequestId() { return requestId; }
+    public void setRequestId(int requestId) { this.requestId = requestId; }
 
-    public int getRequestId() {
-        return requestId;
-    }
+    public String getStudentId() { return studentId; }
+    public void setStudentId(String studentId) { this.studentId = studentId; }
 
-    public void setRequestId(int requestId) {
-        this.requestId = requestId;
-    }
+    public String getLecturerId() { return lecturerId; }
+    public void setLecturerId(String lecturerId) { this.lecturerId = lecturerId; }
 
-    public String getStudentId() {
-        return studentId;
-    }
+    public String getProjectTitle() { return projectTitle; }
+    public void setProjectTitle(String projectTitle) { this.projectTitle = projectTitle; }
 
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
-    }
-
-    public String getLecturerId() {
-        return lecturerId;
-    }
-
-    public void setLecturerId(String lecturerId) {
-        this.lecturerId = lecturerId;
-    }
-
-    public String getProjectTitle() {
-        return projectTitle;
-    }
-
-    public void setProjectTitle(String projectTitle) {
-        this.projectTitle = projectTitle;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

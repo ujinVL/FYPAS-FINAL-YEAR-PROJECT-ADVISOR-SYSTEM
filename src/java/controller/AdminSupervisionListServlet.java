@@ -1,28 +1,34 @@
 package controller;
 
+import dao.SupervisionDAO;
+import model.Supervision;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.IOException;
-import model.User;
 
-@WebServlet("/LecturerDashboardServlet")
-public class LecturerDashboardServlet extends HttpServlet {
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/AdminSupervisionListServlet")
+public class AdminSupervisionListServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
 
-        if (user == null || !"lecturer".equals(user.getRole())) {
+        if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect("login.jsp");
             return;
         }
 
-        // Future: load lecturer-specific data
-        request.getRequestDispatcher("lecturer_dashboard.jsp")
+        SupervisionDAO dao = new SupervisionDAO();
+        List<Supervision> list = dao.getAllSupervisions();
+
+        request.setAttribute("supervisions", list);
+        request.getRequestDispatcher("admin_supervision_list.jsp")
                .forward(request, response);
     }
 }

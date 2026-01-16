@@ -5,10 +5,10 @@ import java.sql.DriverManager;
 
 public class DBConnection {
 
-    private static final String URL = "jdbc:mysql://localhost:3306/fypas_db";
+    private static final String URL =
+        "jdbc:mysql://localhost:3306/fypas_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String USER = "root";
     private static final String PASSWORD = "";
-    // put password here if your MySQL has one
 
     public static Connection getConnection() {
         Connection con = null;

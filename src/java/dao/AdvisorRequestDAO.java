@@ -1,24 +1,28 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import util.DBConnection;
 import model.AdvisorRequest;
-import java.sql.ResultSet;
+import util.DBConnection;
+
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class AdvisorRequestDAO {
 
-    public void submitRequest(AdvisorRequest req) {
+    /* ===============================
+       CREATE REQUEST (STUDENT)
+       =============================== */
+    public void createRequest(String studentId, String lecturerId, String projectTitle) {
 
-        try {
-            Connection con = DBConnection.getConnection();
-            String sql = "INSERT INTO advisor_requests (student_id, lecturer_id, project_title) VALUES (?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(sql);
+        String sql = "INSERT INTO advisor_requests (student_id, lecturer_id, project_title, status) "
+                   + "VALUES (?, ?, ?, 'PENDING')";
 
-            ps.setString(1, req.getStudentId());
-            ps.setString(2, req.getLecturerId());
-            ps.setString(3, req.getProjectTitle());
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, studentId);
+            ps.setString(2, lecturerId);
+            ps.setString(3, projectTitle);
 
             ps.executeUpdate();
 
@@ -26,16 +30,19 @@ public class AdvisorRequestDAO {
             e.printStackTrace();
         }
     }
-    public ArrayList<AdvisorRequest> getRequestsByLecturer(String lecturerId) {
 
-        ArrayList<AdvisorRequest> list = new ArrayList<>();
+    /* ===============================
+       GET REQUESTS BY STUDENT
+       =============================== */
+    public List<AdvisorRequest> getRequestsByStudent(String studentId) {
 
-        try {
-            Connection con = DBConnection.getConnection();
-            String sql = "SELECT * FROM advisor_requests WHERE lecturer_id = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, lecturerId);
+        List<AdvisorRequest> list = new ArrayList<>();
+        String sql = "SELECT * FROM advisor_requests WHERE student_id = ?";
 
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, studentId);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -54,16 +61,50 @@ public class AdvisorRequestDAO {
 
         return list;
     }
-    public void updateRequestStatus(int requestId, String status) {
 
-        try {
-            Connection con = DBConnection.getConnection();
-            String sql = "UPDATE advisor_requests SET status = ? WHERE request_id = ?";
-            PreparedStatement ps = con.prepareStatement(sql);
+    /* ===============================
+       GET REQUESTS BY LECTURER
+       =============================== */
+    public List<AdvisorRequest> getRequestsByLecturer(String lecturerId) {
+
+        List<AdvisorRequest> list = new ArrayList<>();
+        String sql = "SELECT * FROM advisor_requests WHERE lecturer_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, lecturerId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                AdvisorRequest ar = new AdvisorRequest();
+                ar.setRequestId(rs.getInt("request_id"));
+                ar.setStudentId(rs.getString("student_id"));
+                ar.setLecturerId(rs.getString("lecturer_id"));
+                ar.setProjectTitle(rs.getString("project_title"));
+                ar.setStatus(rs.getString("status"));
+                list.add(ar);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    /* ===============================
+       UPDATE REQUEST STATUS
+       =============================== */
+    public void updateRequestStatus(String requestId, String status) {
+
+        String sql = "UPDATE advisor_requests SET status = ? WHERE request_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, status);
-            ps.setInt(2, requestId);
-
+            ps.setInt(2, Integer.parseInt(requestId));
             ps.executeUpdate();
 
         } catch (Exception e) {
@@ -71,31 +112,74 @@ public class AdvisorRequestDAO {
         }
     }
 
-    public ArrayList<AdvisorRequest> getAllRequests() {
+    /* ===============================
+       DELETE REQUEST (CANCEL)
+       =============================== */
+    public void deleteRequest(String requestId) {
 
-        ArrayList<AdvisorRequest> list = new ArrayList<>();
+        String sql = "DELETE FROM advisor_requests WHERE request_id = ?";
 
-        try {
-            Connection con = DBConnection.getConnection();
-            String sql = "SELECT * FROM advisor_requests";
-            PreparedStatement ps = con.prepareStatement(sql);
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, Integer.parseInt(requestId));
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public AdvisorRequest getRequestById(int requestId) {
+
+        AdvisorRequest ar = null;
+        String sql = "SELECT * FROM advisor_requests WHERE request_id = ?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, requestId);
             ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
-                AdvisorRequest ar = new AdvisorRequest();
+            if (rs.next()) {
+                ar = new AdvisorRequest();
                 ar.setRequestId(rs.getInt("request_id"));
                 ar.setStudentId(rs.getString("student_id"));
                 ar.setLecturerId(rs.getString("lecturer_id"));
                 ar.setProjectTitle(rs.getString("project_title"));
                 ar.setStatus(rs.getString("status"));
-                list.add(ar);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return list;
+        return ar;
+    }
+    
+    public boolean hasActiveRequest(String studentId) {
+
+        boolean exists = false;
+
+        String sql =
+            "SELECT COUNT(*) FROM advisor_requests " +
+            "WHERE student_id = ? AND status IN ('PENDING', 'APPROVED')";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, studentId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                exists = rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return exists;
     }
 
 

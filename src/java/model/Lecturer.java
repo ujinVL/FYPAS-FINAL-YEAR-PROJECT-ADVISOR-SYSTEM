@@ -3,14 +3,14 @@ package model;
 public class Lecturer {
 
     private String lecturerId;
+    private String lecturerName;
     private String specialization;
     private String researchArea;
     private int maxCapacity;
     private String availability;
     private String bio;
 
-    public Lecturer() {
-    }
+    public Lecturer() {}
 
     public String getLecturerId() {
         return lecturerId;
@@ -18,6 +18,14 @@ public class Lecturer {
 
     public void setLecturerId(String lecturerId) {
         this.lecturerId = lecturerId;
+    }
+
+    public String getLecturerName() {
+        return lecturerName;
+    }
+
+    public void setLecturerName(String lecturerName) {
+        this.lecturerName = lecturerName;
     }
 
     public String getSpecialization() {

@@ -7,12 +7,11 @@ public class User {
     private String email;
     private String password;
     private String role;
+    private String faculty;
+    private String status;
 
-    // No-argument constructor (REQUIRED for JavaBean)
-    public User() {
-    }
+    // ===== GETTERS & SETTERS =====
 
-    // Getters and Setters
     public String getUserId() {
         return userId;
     }
@@ -51,5 +50,21 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getFaculty() {
+        return faculty;
+    }
+
+    public void setFaculty(String faculty) {
+        this.faculty = faculty;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

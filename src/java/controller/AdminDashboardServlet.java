@@ -1,13 +1,12 @@
 package controller;
 
+import dao.SupervisionDAO;
 import dao.UserDAO;
-import dao.AdvisorRequestDAO;
-import model.AdvisorRequest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+
 import java.io.IOException;
-import java.util.ArrayList;
 
 @WebServlet("/AdminDashboardServlet")
 public class AdminDashboardServlet extends HttpServlet {
@@ -16,15 +15,30 @@ public class AdminDashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
         UserDAO userDAO = new UserDAO();
-        AdvisorRequestDAO reqDAO = new AdvisorRequestDAO();
+        SupervisionDAO supervisionDAO = new SupervisionDAO();
 
-        int totalUsers = userDAO.countUsers();
-        ArrayList<AdvisorRequest> requests = reqDAO.getAllRequests();
+        // Dashboard statistics
+        int totalStudents = userDAO.countByRole("student");
+        int totalLecturers = userDAO.countByRole("lecturer");
+        int activeSupervisions = supervisionDAO.countActiveSupervisions();
 
-        request.setAttribute("totalUsers", totalUsers);
-        request.setAttribute("requests", requests);
+        // Set attributes
+        request.setAttribute("totalStudents", totalStudents);
+        request.setAttribute("totalLecturers", totalLecturers);
+        request.setAttribute("activeSupervisions", activeSupervisions);
 
-        request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+        // Optional (if you want later)
+        request.setAttribute("pendingRequests", 0);
+
+        request.getRequestDispatcher("admin_dashboard.jsp")
+               .forward(request, response);
     }
 }

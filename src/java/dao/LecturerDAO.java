@@ -22,11 +22,13 @@ public class LecturerDAO {
             while (rs.next()) {
                 Lecturer l = new Lecturer();
                 l.setLecturerId(rs.getString("lecturer_id"));
+                l.setLecturerName(rs.getString("lecturer_name"));
                 l.setSpecialization(rs.getString("specialization"));
                 l.setResearchArea(rs.getString("research_area"));
                 l.setMaxCapacity(rs.getInt("max_capacity"));
                 l.setAvailability(rs.getString("availability"));
                 l.setBio(rs.getString("bio"));
+
 
                 list.add(l);
             }
