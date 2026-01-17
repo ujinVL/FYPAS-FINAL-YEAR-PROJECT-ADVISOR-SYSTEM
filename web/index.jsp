@@ -101,7 +101,7 @@
     <h1>FYPAS</h1>
     <div class="nav">
         <a href="login.jsp">LOG IN</a>
-        <a href="signup.jsp">SIGN UP</a>
+        <a href="sign_up.jsp">SIGN UP</a>
     </div>
 </div>
 
